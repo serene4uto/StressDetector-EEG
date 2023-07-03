@@ -1,0 +1,14 @@
+
+
+numpy
+scipy==1.11.1
+pandas==2.0.3
+mne==1.4.2
+xlrd >= 2.0.1
+
+
+tensorflow==2.10.0
+tensorflow-directml-plugin
+
+
+ipykernel
