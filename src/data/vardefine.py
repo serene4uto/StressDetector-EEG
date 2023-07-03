@@ -1,4 +1,4 @@
-
+import numpy as np
 
 DTS_DIR_ORIGIN = "data/origin"
 DTS_DIR_ORIGIN_RAW = DTS_DIR_ORIGIN + "/raw_data"
@@ -14,6 +14,8 @@ DTS_STRESS_LVL_THRESHOLD = 5
 DTS_MAX_SUBJECT = 40
 DTS_MAX_TRIAL = 3
 DTS_MAX_TASK_DURATION_SEC = 25
+
+DTS_TRIAL_LIST = np.arange(1, DTS_MAX_TRIAL+1).tolist()
 
 DTS_CLASS_LIST = [
     "Low Stress",
@@ -54,7 +56,6 @@ DTS_CHANNEL_LIST = [
  'F4',
  'F8',
  'Fp2']
-
 
 COLUMNS_TO_RENAME = {
     'Subject No.': 'subject_no',
