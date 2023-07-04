@@ -6,7 +6,7 @@ import logging
 import pickle
 import shutil
 
-import dataloader
+import data_loader
 import vardefine as v
 
 import filter_pipeline as fp
@@ -18,14 +18,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--tasks', nargs='+', type=str, default=v.DTS_TASK_LIST, choices=v.DTS_TASK_LIST, 
             help="Select tasks")
-    parser.add_argument('--subjects', nargs='+', type=int, default=np.arange(1, v.DTS_MAX_SUBJECT+1).tolist(),
-                        choices=np.arange(1, v.DTS_MAX_SUBJECT+1).tolist(), help="Select subjects")
+    parser.add_argument('--subjects', nargs='+', type=int, default=v.DTS_SUBJECT_LIST,
+                        choices=v.DTS_SUBJECT_LIST, help="Select subjects")
     # parser.add_argument('--trials', nargs='+', type=int, default=v.DTS_TRIAL_LIST,
     #                     choices=v.DTS_TRIAL_LIST, help="Select trials")
     parser.add_argument('--channels', nargs='+', type=str, default=v.DTS_CHANNEL_LIST,
                         choices=v.DTS_CHANNEL_LIST, help="Select channels")
     
-    parser.add_argument('--filter-pipeline', type=str, default=None, 
+    parser.add_argument('--filter-pipeline', type=str, default="NoFilter", 
                         choices=fp.FILTER_PIPELINE.keys(), help="Choose a filter pipeline")
     
     parser.add_argument('--epoch-duration', type=float, default=v.DTS_MAX_TASK_DURATION_SEC, help="Set epoch duration in seconds to segment")
@@ -39,10 +39,12 @@ if __name__ == "__main__":
 
     # Create Meta
     metadata = {
-        "tasks"     : v.DTS_TASK_LIST,
+        "sfreq"     : v.DTS_SAMPLING_FREQ,
+        "tasks"     : args.tasks,
         "subjects"  : args.subjects,
         "trials"    : v.DTS_TRIAL_LIST,
         "channels"  : args.channels,
+        "classes"   : v.DTS_CLASS_LIST,
         "filters"   : args.filter_pipeline,
     } 
 
@@ -68,13 +70,13 @@ if __name__ == "__main__":
             pickle.dump(metadata, f)
 
         # load dataset
-        dataset = dataloader.load_data( task_list = args.tasks, 
+        dataset = data_loader.load_data( task_list = args.tasks, 
                                         subject_list=args.subjects,
                                         trial_list=v.DTS_TRIAL_LIST,
                                         channel_list=args.channels)
         
         # load origin labels
-        labels_df = dataloader.load_labels(task_list = args.tasks, 
+        labels_df = data_loader.load_labels(task_list = args.tasks, 
                                             subject_list=args.subjects,
                                             trial_list=v.DTS_TRIAL_LIST,
                                             stress_lvl_threshold=5)
@@ -88,7 +90,7 @@ if __name__ == "__main__":
         epoch_dataset = []
         event_id = {}
         for cl in v.DTS_CLASS_LIST:
-            event_id[cl] = v.DTS_CLASS_LIST.index(cl)
+            event_id[cl] = v.DTS_CLASS_LIST.index(cl)+1
 
         for subject_idx, subject_id in enumerate(args.subjects):
             task_set = []
@@ -106,7 +108,7 @@ if __name__ == "__main__":
                         )
 
                     # Filter
-                    if args.filter_pipeline:
+                    if args.filter_pipeline != "NoFilter":
                         fp.FILTER_PIPELINE.get(args.filter_pipeline)(epoch_temp)
 
                     trial_set.append(epoch_temp)

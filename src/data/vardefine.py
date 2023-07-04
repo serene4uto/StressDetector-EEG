@@ -8,19 +8,20 @@ DTS_DIR_PROCESSED = "data/processed"
 
 DTS_SAMPLING_FREQ = 128
 
-DTS_TASK_LIST= ["Arithmetic", "Mirror_image", "Stroop", "Relax"]
+DTS_TASK_LIST= ["Relax", "Arithmetic", "Mirror_image", "Stroop"]
 
 DTS_STRESS_LVL_THRESHOLD = 5
 DTS_MAX_SUBJECT = 40
 DTS_MAX_TRIAL = 3
 DTS_MAX_TASK_DURATION_SEC = 25
 
+DTS_SUBJECT_LIST = np.arange(1, DTS_MAX_SUBJECT+1).tolist()
 DTS_TRIAL_LIST = np.arange(1, DTS_MAX_TRIAL+1).tolist()
 
 DTS_CLASS_LIST = [
+    "Relax",
     "Low Stress",
     "High Stress",
-    "Relax",
 ]
 
 DTS_CHANNEL_LIST = [
