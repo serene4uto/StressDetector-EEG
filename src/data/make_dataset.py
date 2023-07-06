@@ -9,7 +9,7 @@ import shutil
 import data_loader
 import vardefine as v
 
-import filter_pipeline as fp
+import preprocessing_pipeline as pp
 
 from pathlib import Path
 
@@ -25,8 +25,8 @@ if __name__ == "__main__":
     parser.add_argument('--channels', nargs='+', type=str, default=v.DTS_CHANNEL_LIST,
                         choices=v.DTS_CHANNEL_LIST, help="Select channels")
     
-    parser.add_argument('--filter-pipeline', type=str, default="NoFilter", 
-                        choices=fp.FILTER_PIPELINE.keys(), help="Choose a filter pipeline")
+    parser.add_argument('--preprocessing-pipeline', type=str, default=None, 
+                        choices=pp.PREPROCESSING_PIPELINES.keys(), help="Choose a filter pipeline")
     
     parser.add_argument('--epoch-duration', type=float, default=v.DTS_MAX_TASK_DURATION_SEC, help="Set epoch duration in seconds to segment")
     parser.add_argument('--overlap-rate', type=float, default=0, help="Set epoch overlap rate to segment")
@@ -39,17 +39,17 @@ if __name__ == "__main__":
 
     # Create Meta
     metadata = {
-        "sfreq"     : v.DTS_SAMPLING_FREQ,
-        "tasks"     : args.tasks,
-        "subjects"  : args.subjects,
-        "trials"    : v.DTS_TRIAL_LIST,
-        "channels"  : args.channels,
-        "classes"   : v.DTS_CLASS_LIST,
-        "filters"   : args.filter_pipeline,
+        "sfreq"             : v.DTS_SAMPLING_FREQ,
+        "tasks"             : args.tasks,
+        "subjects"          : args.subjects,
+        "trials"            : v.DTS_TRIAL_LIST,
+        "channels"          : args.channels,
+        "classes"           : v.DTS_CLASS_LIST,
+        "preprocessing"     : args.preprocessing_pipeline,
     } 
 
     # Check cache
-    save_dir_path = f"{args.save_path}/{args.epoch_duration}sec_overlap{args.overlap_rate}_{args.filter_pipeline}"
+    save_dir_path = f"{args.save_path}/{args.epoch_duration}sec_overlap{args.overlap_rate}_{args.preprocessing_pipeline}"
     save_metadata_file_path = save_dir_path + f"/metadata.pkl"
     cached = False
     
@@ -105,15 +105,15 @@ if __name__ == "__main__":
                             raw=temp, duration=args.epoch_duration,
                             preload=True, overlap=args.overlap_rate,
                             id = int(labels_df.loc[subject_id, f"t{trial}_{task}"]),
-                        )
+                        ).set_montage(montage)
 
-                    # Filter
-                    if args.filter_pipeline != "NoFilter":
-                        fp.FILTER_PIPELINE.get(args.filter_pipeline)(epoch_temp)
+                    # Preprocessing
+                    if args.preprocessing_pipeline:
+                        epoch_temp = pp.PREPROCESSING_PIPELINES.get(args.preprocessing_pipeline)(epoch_temp)
 
                     trial_set.append(epoch_temp)
       
-                temp_set = mne.concatenate_epochs(trial_set).set_montage(montage) 
+                temp_set = mne.concatenate_epochs(trial_set) 
                 temp_set.event_id = event_id
                 task_set.append(temp_set)    
 

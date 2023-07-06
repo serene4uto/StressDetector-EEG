@@ -53,6 +53,7 @@ def load_labels(task_list, subject_list, trial_list, stress_lvl_threshold=v.DTS_
     
     if "Relax" in task_list:
         col_indx = task_list.index("Relax")
+        
         # Add value label for Relax
         for trial_idx, trial in enumerate(trial_list):
             labels_df.insert(col_indx * len(trial_list) + trial_idx,  f"t{trial}_Relax", 1)  

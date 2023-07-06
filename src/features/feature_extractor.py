@@ -56,7 +56,7 @@ FEATURE_EXTRACTOR = {
 
 }
 
-def extract_feature_set(features, epoch_set, metadata):
+def extract_scalar_feature_set(features, epoch_set, metadata):
     '''
         Extracting Feature Set.
         Args:
@@ -67,11 +67,7 @@ def extract_feature_set(features, epoch_set, metadata):
             metadata : (dict) metadata of epoch_set.
         
         Output:
-            feature_set: subject (list)--> classes (list) --> epoch (list) -->computed feature set (ndarray: channel x features).
-
-
-
-
+            feature_set: subject (list)--> classes (list) --> epochs (list) -->computed feature set (ndarray: channel x features).
     '''
     feature_set = []
     for subj_idx, subj_id in enumerate(metadata['subjects']):
