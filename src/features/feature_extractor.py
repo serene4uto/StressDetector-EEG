@@ -39,6 +39,86 @@ def epoch_feature_svd_entropy(epoch, metadata):
     return extract_features(epoch[None, :], metadata['sfreq'], {'svd_entropy'}).transpose()
 
 
+"""--------------------Time-Frequency---------------------------"""
+
+def epoch_feature_eegband_psd_welch(epoch, metadata):
+    # _, n_channels, n_tpoint = epoch.get_data().shape
+    sfreq = metadata['sfreq']
+    n_per_seg = int(sfreq)
+    n_fft = int(n_per_seg*2)
+    psds, freqs = mne.time_frequency.psd_array_welch(epoch, sfreq = sfreq, output = 'power',
+                             n_fft = n_fft, n_overlap = int(0.5*n_per_seg), n_per_seg = n_per_seg)
+
+    max_f = freqs[-1]
+
+    freq_bands = {
+        'Delta' : (0.5  , 4), 
+        'Theta' : (4    , 8), 
+        'Alpha' : (8    , 13), 
+        'Beta'  : (13   , 30), 
+        'Gamma' : (30   , 100 if max_f > 100 else max_f)}
+    
+    band_psd = []
+
+    # Compute the band psd for each frequency band within each epoch
+    for band, (fmin, fmax) in freq_bands.items():
+        band_indices = np.where(np.logical_and(freqs >= fmin, freqs <= fmax))[0]
+        band_psd.append(np.sum(psds[:, band_indices], axis=1).squeeze())
+    
+    return np.array(band_psd).T
+
+
+def epoch_feature_eegband_psd_multitaper(epoch, metadata):
+    # _, n_channels, n_tpoint = epoch.get_data().shape
+    sfreq = metadata['sfreq']
+    psds, freqs = mne.time_frequency.psd_array_multitaper(epoch, sfreq = sfreq, output = 'power')
+
+    max_f = freqs[-1]
+
+    freq_bands = {
+        'Delta' : (0.5  , 4), 
+        'Theta' : (4    , 8), 
+        'Alpha' : (8    , 13), 
+        'Beta'  : (13   , 30), 
+        'Gamma' : (30   , 100 if max_f > 100 else max_f)}
+    
+    band_psd = []
+
+    # Compute the band psd for each frequency band within each epoch
+    for band, (fmin, fmax) in freq_bands.items():
+        band_indices = np.where(np.logical_and(freqs >= fmin, freqs <= fmax))[0]
+        band_psd.append(np.sum(psds[:, band_indices], axis=1).squeeze())
+    
+    return np.array(band_psd).T
+
+
+def epoch_feature_rbpsd_tab_welch(epoch, metadata):
+    '''
+        Calculate psd of three band theta (4-8 Hz), alpha (8-12 Hz), beta (13-30 Hz) using welch method
+    '''
+    
+    tab_psd = epoch_feature_eegband_psd_welch(epoch, metadata)[:, [2,3,4]]
+    total_power = np.sum(tab_psd, axis = 1).reshape(-1, 1)
+
+    rbptab_psd = tab_psd / total_power
+
+    return rbptab_psd
+
+
+def epoch_feature_rbpsd_tab_multitaper(epoch, metadata):
+    '''
+        Calculate psd of three band theta (4-8 Hz), alpha (8-12 Hz), beta (13-30 Hz) using multitaper method
+    '''
+
+    tab_psd = epoch_feature_eegband_psd_multitaper(epoch, metadata)[:, [2,3,4]]
+    total_power = np.sum(tab_psd, axis = 1).reshape(-1, 1)
+
+    rbptab_psd = tab_psd / total_power
+
+    return rbptab_psd
+
+
+
 
 
 FEATURE_EXTRACTOR = {
@@ -51,8 +131,15 @@ FEATURE_EXTRACTOR = {
     'hjorth_complexity' : epoch_feature_hjorth_complexity,
 
     # Entropy
-    'spect_entropy'       : epoch_feature_spect_entropy,
-    'svd_entropy'         : epoch_feature_svd_entropy,
+    'spect_entropy'      : epoch_feature_spect_entropy,
+    'svd_entropy'        : epoch_feature_svd_entropy,
+
+    # Time-Frequency
+    'psd_eegband_welch'         : epoch_feature_eegband_psd_welch,
+    'psd_eegband_multitaper'    : epoch_feature_eegband_psd_multitaper,
+    
+    'rbpsd_tab_welch'           : epoch_feature_rbpsd_tab_welch, 
+    'rbpsd_tab_multitaper'      : epoch_feature_rbpsd_tab_multitaper, 
 
 }
 
