@@ -10,6 +10,9 @@ from mne_features.feature_extraction import extract_features
 
 
 """--------------------Time-Series---------------------------"""
+def epoch_feature_raw(epoch, metadata):
+    return epoch[None, :].squeeze()
+
 def epoch_feature_mean(epoch, metadata):
     return extract_features(epoch[None, :], metadata['sfreq'], {'mean'}).transpose()
 
@@ -118,10 +121,9 @@ def epoch_feature_rbpsd_tab_multitaper(epoch, metadata):
     return rbptab_psd
 
 
+SCALAR_FEATURE_EXTRACTOR = {
+    'raw'               : epoch_feature_raw,
 
-
-
-FEATURE_EXTRACTOR = {
     # Time-Series
     'mean'              : epoch_feature_mean,
     'std'               : epoch_feature_std,
@@ -140,6 +142,9 @@ FEATURE_EXTRACTOR = {
     
     'rbpsd_tab_welch'           : epoch_feature_rbpsd_tab_welch, 
     'rbpsd_tab_multitaper'      : epoch_feature_rbpsd_tab_multitaper, 
+}
+
+IMAGE_FEATURE_EXTRACTOR = {
 
 }
 
@@ -162,7 +167,7 @@ def extract_scalar_feature_set(features, epoch_set, metadata):
         for epoch_idx, epoch in enumerate(epoch_set[subj_idx]):
             ftr_set = []
             for ftr in features:
-                ftr_set.append(FEATURE_EXTRACTOR.get(ftr)(epoch, metadata))
+                ftr_set.append(SCALAR_FEATURE_EXTRACTOR.get(ftr)(epoch, metadata))
             
             class_set[epoch_set[subj_idx].events[epoch_idx, -1]-1].append(
                 np.concatenate(ftr_set, axis=1)

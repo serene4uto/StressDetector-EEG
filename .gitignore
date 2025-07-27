@@ -1,6 +1,5 @@
-/venv
-/data
-/draft_test
-/src/__pycache__
-/src/data/__pycache__
-/src/features/__pycache__
+.data
+**/__pycache__/
+*.py[cod]
+data_cache
+.exp/
