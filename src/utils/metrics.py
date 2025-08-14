@@ -43,6 +43,76 @@ class AccuracyWithLoss(BaseMetric):
         return dict(mean_eval_accuracy=100 * total_correct / total_size,
                     mean_eval_loss=total_loss / total_size)
 
+
+class TrainingAccuracyWithLoss(BaseMetric):
+    """Metric for training phase that computes both accuracy and loss"""
+    def process(self, data_batch, data_samples):
+        score, gt = data_samples
+        # save the middle result of a batch to `self.results`
+        self.results.append({
+            'train_batch_size': len(gt),
+            'train_correct': (score.argmax(dim=1) == gt).sum().cpu(),
+            'train_loss': F.cross_entropy(score, gt).cpu(),
+        })
+    
+    def compute_metrics(self, results):
+        total_correct = sum(item['train_correct'] for item in results)
+        total_size = sum(item['train_batch_size'] for item in results)
+        total_loss = sum(item['train_loss'] for item in results)
+        # return the dict containing the training results
+        return dict(train_accuracy=100 * total_correct / total_size,
+                    train_loss=total_loss / total_size)
+
+
+class ComprehensiveTrainingMetrics(BaseMetric):
+    """Comprehensive training metrics including accuracy, loss, and additional insights"""
+    def process(self, data_batch, data_samples):
+        score, gt = data_samples
+        pred = score.argmax(dim=1)
+        correct = (pred == gt).sum().cpu()
+        loss = F.cross_entropy(score, gt).cpu()
+        
+        # Additional metrics
+        confidence = torch.softmax(score, dim=1).max(dim=1)[0].mean().cpu()
+        
+        self.results.append({
+            'batch_size': len(gt),
+            'correct': correct,
+            'loss': loss,
+            'confidence': confidence,
+            'predictions': pred.cpu(),
+            'ground_truth': gt.cpu(),
+        })
+    
+    def compute_metrics(self, results):
+        total_correct = sum(item['correct'] for item in results)
+        total_size = sum(item['batch_size'] for item in results)
+        total_loss = sum(item['loss'] for item in results)
+        avg_confidence = sum(item['confidence'] for item in results) / len(results)
+        
+        # Compute per-class accuracy if we have class information
+        all_preds = torch.cat([item['predictions'] for item in results])
+        all_gts = torch.cat([item['ground_truth'] for item in results])
+        
+        metrics = {
+            'train_accuracy': 100 * total_correct / total_size,
+            'train_loss': total_loss / len(results),
+            'train_confidence': avg_confidence.item(),
+        }
+        
+        # Add per-class accuracy if we can determine number of classes
+        if len(all_gts) > 0:
+            num_classes = max(all_gts.max().item(), all_preds.max().item()) + 1
+            if num_classes <= 10:  # Only for reasonable number of classes
+                for cls in range(num_classes):
+                    cls_mask = all_gts == cls
+                    if cls_mask.sum() > 0:
+                        cls_acc = (all_preds[cls_mask] == all_gts[cls_mask]).float().mean() * 100
+                        metrics[f'train_acc_class_{cls}'] = cls_acc.item()
+        
+        return metrics
+
+
 class ConfusionMatrix(BaseMetric):
     default_prefix = 'confusion_matrix'
     def __init__(self,

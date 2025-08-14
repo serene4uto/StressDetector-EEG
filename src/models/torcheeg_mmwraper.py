@@ -33,7 +33,10 @@ class MMEEGNet(BaseModel):
         outputs = nn.Sigmoid()(outputs) 
         
         if mode == 'loss':
-            return {'loss': F.cross_entropy(outputs, labels)}
+            loss = F.cross_entropy(outputs, labels)
+            # Also compute accuracy for training monitoring
+            accuracy = (outputs.argmax(dim=1) == labels).float().mean() * 100
+            return {'loss': loss, 'train_accuracy': accuracy}
         elif mode == 'predict':
             return outputs, labels
 
@@ -58,7 +61,10 @@ class MMFBCNet(BaseModel):
     def forward(self, eeg_epochs, labels, mode):
         outputs = self.fbcnet(eeg_epochs)
         if mode == 'loss':
-            return {'loss': F.cross_entropy(outputs, labels)}
+            loss = F.cross_entropy(outputs, labels)
+            # Also compute accuracy for training monitoring
+            accuracy = (outputs.argmax(dim=1) == labels).float().mean() * 100
+            return {'loss': loss, 'train_accuracy': accuracy}
         elif mode == 'predict':
             return outputs, labels
         
@@ -86,6 +92,9 @@ class MMTSCeption(BaseModel):
     def forward(self, eeg_epochs, labels, mode):
         outputs = self.tsception(eeg_epochs)
         if mode == 'loss':
-            return {'loss': F.cross_entropy(outputs, labels)}
+            loss = F.cross_entropy(outputs, labels)
+            # Also compute accuracy for training monitoring
+            accuracy = (outputs.argmax(dim=1) == labels).float().mean() * 100
+            return {'loss': loss, 'train_accuracy': accuracy}
         elif mode == 'predict':
             return outputs, labels

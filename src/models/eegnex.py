@@ -138,6 +138,9 @@ class MMEEGNeX(BaseModel):
         outputs = nn.Sigmoid()(outputs) 
         
         if mode == 'loss':
-            return {'loss': F.cross_entropy(outputs, labels)}
+            loss = F.cross_entropy(outputs, labels)
+            # Also compute accuracy for training monitoring
+            accuracy = (outputs.argmax(dim=1) == labels).float().mean() * 100
+            return {'loss': loss, 'train_accuracy': accuracy}
         elif mode == 'predict':
             return outputs, labels
