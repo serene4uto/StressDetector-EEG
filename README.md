@@ -1,1 +1,1 @@
-# StressDetector-EEG-v2
+# StressDetector-EEG
