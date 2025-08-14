@@ -1,0 +1,57 @@
+{
+  "description": "Search space template for MMEEGNet",
+  "common": {
+    "lr": [
+      1e-05,
+      0.01
+    ],
+    "batch_size": [
+      16,
+      32,
+      64,
+      128
+    ],
+    "optimizer": [
+      "Adam",
+      "AdamW",
+      "SGD"
+    ]
+  },
+  "model": {
+    "dropout": [
+      0.1,
+      0.8
+    ],
+    "F1": [
+      4,
+      16
+    ],
+    "F2": [
+      8,
+      32
+    ],
+    "D": [
+      1,
+      4
+    ],
+    "kernel_1": [
+      32,
+      64,
+      128
+    ],
+    "kernel_2": [
+      8,
+      16,
+      32
+    ]
+  },
+  "notes": {
+    "lr": "Learning rate range (min, max) for log scale",
+    "batch_size": "List of batch sizes to try",
+    "optimizer": "List of optimizers to try",
+    "dropout": "Dropout rate range (min, max)",
+    "F1/F2": "Number of temporal/spatial filters",
+    "D": "Depth multiplier",
+    "kernel_1/kernel_2": "Kernel sizes for temporal/spatial convolution"
+  }
+}

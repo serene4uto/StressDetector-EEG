@@ -1,0 +1,25 @@
+{
+  "description": "Example search space for MMEEGNet optimization",
+  "common": {
+    "lr": [1e-4, 1e-2],
+    "batch_size": [32, 64, 128],
+    "optimizer": ["Adam", "AdamW"]
+  },
+  "model": {
+    "dropout": [0.3, 0.6],
+    "F1": [8, 12],
+    "F2": [16, 24],
+    "D": [2, 3],
+    "kernel_1": [64, 128],
+    "kernel_2": [16, 32]
+  },
+  "notes": {
+    "lr": "Learning rate range (min, max) for log scale",
+    "batch_size": "List of batch sizes to try",
+    "optimizer": "List of optimizers to try",
+    "dropout": "Dropout rate range (min, max)",
+    "F1/F2": "Number of temporal/spatial filters",
+    "D": "Depth multiplier",
+    "kernel_1/kernel_2": "Kernel sizes for temporal/spatial convolution"
+  }
+}

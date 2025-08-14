@@ -5,6 +5,7 @@ Follows the notebook pattern but makes it reusable for different models and data
 
 import argparse
 import os
+import multiprocessing
 import torch
 from pathlib import Path
 from torch.utils.data import DataLoader, random_split
@@ -22,19 +23,35 @@ def register_models_and_metrics():
         ComprehensiveTrainingMetrics, ConfusionMatrix
     )
     
-    # Register models
-    MODELS.register_module(name='MMEEGNet', module=MMEEGNet)
-    MODELS.register_module(name='MMFBCNet', module=MMFBCNet)
-    MODELS.register_module(name='MMTSCeption', module=MMTSCeption)
-    MODELS.register_module(name='MMEEGNeX', module=MMEEGNeX)
-    MODELS.register_module(name='MMResEEGNet', module=MMResEEGNet)
+    # Register models (with safety check to prevent duplicate registration)
+    model_registrations = [
+        ('MMEEGNet', MMEEGNet),
+        ('MMFBCNet', MMFBCNet),
+        ('MMTSCeption', MMTSCeption),
+        ('MMEEGNeX', MMEEGNeX),
+        ('MMResEEGNet', MMResEEGNet)
+    ]
     
-    # Register metrics
-    METRICS.register_module(name='Accuracy', module=Accuracy)
-    METRICS.register_module(name='AccuracyWithLoss', module=AccuracyWithLoss)
-    METRICS.register_module(name='TrainingAccuracyWithLoss', module=TrainingAccuracyWithLoss)
-    METRICS.register_module(name='ComprehensiveTrainingMetrics', module=ComprehensiveTrainingMetrics)
-    METRICS.register_module(name='ConfusionMatrix', module=ConfusionMatrix)
+    for name, module in model_registrations:
+        if name not in MODELS:
+            MODELS.register_module(name=name, module=module)
+        else:
+            print(f"Model {name} already registered, skipping...")
+    
+    # Register metrics (with safety check to prevent duplicate registration)
+    metric_registrations = [
+        ('Accuracy', Accuracy),
+        ('AccuracyWithLoss', AccuracyWithLoss),
+        ('TrainingAccuracyWithLoss', TrainingAccuracyWithLoss),
+        ('ComprehensiveTrainingMetrics', ComprehensiveTrainingMetrics),
+        ('ConfusionMatrix', ConfusionMatrix)
+    ]
+    
+    for name, module in metric_registrations:
+        if name not in METRICS:
+            METRICS.register_module(name=name, module=module)
+        else:
+            print(f"Metric {name} already registered, skipping...")
 
 
 def create_model(model_type, **kwargs):
@@ -133,7 +150,7 @@ def create_deap_dataset(data_root, cache_path, split_ratios=[0.6, 0.2, 0.2], ran
                 [7.5, 2.5],
                 [5.0, 5.0]]),
         ]),
-        num_worker=8
+        num_worker=0
     )
     
     # Split dataset
@@ -168,7 +185,7 @@ def create_sam40_dataset(data_path, split_ratios=[0.6, 0.2, 0.2], random_seed=42
     return train_dataset, val_dataset, test_dataset
 
 
-def create_dataloaders(train_dataset, val_dataset, test_dataset, batch_size=64, num_workers=2):
+def create_dataloaders(train_dataset, val_dataset, test_dataset, batch_size=64, num_workers=0):
     """Create dataloaders for train/val/test datasets"""
     
     train_loader = DataLoader(
@@ -349,4 +366,6 @@ def main():
 
 
 if __name__ == "__main__":
+    # Fix for Windows multiprocessing issues with scikit-learn
+    multiprocessing.set_start_method('spawn', force=True)
     main()
