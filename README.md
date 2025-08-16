@@ -370,6 +370,8 @@ The models achieve competitive performance on stress detection tasks with compre
 - **Primary Dataset**: DEAP (Database for Emotion Analysis using Physiological signals)
 - **Dataset Repurposing**: Originally designed for emotion recognition, repurposed for stress detection through label mapping
 - **EEG Configuration**: 32 electrodes, 128 Hz sampling rate
+- **Sample Duration**: 1 second per sample (128 time points)
+- **Input Shape**: (1, 32, 128) - (channels, electrodes, time points)
 - **Data Split**: Train/Validation/Test split with consistent subject separation
 - **Stress Classes**: 3-class classification (Low/Medium/High stress levels)
 
@@ -379,6 +381,7 @@ The models achieve competitive performance on stress detection tasks with compre
 - **Batch Size**: 128 (production setting)
 - **Framework**: PyTorch with MMEngine training framework
 - **Tuning**: Optuna with TPE (Tree-structured Parzen Estimator) sampler
+- **Data Split Strategy**: Random sample split (60% train, 20% validation, 20% test) - individual EEG epochs are randomly assigned to splits without preserving subject or temporal boundaries
 
 ### 🏆 **Model Performance Rankings**
 
