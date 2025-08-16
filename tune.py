@@ -247,12 +247,16 @@ def create_objective(model_type, dataset_type, data_root=None, cache_path=None,
             })
             
         elif model_type == 'MMEEGNeX':
+            # Get individual values for F1 and F2 lists
+            F1_1 = trial.suggest_int('F1_1', model_space['F1_1'][0], model_space['F1_1'][1])
+            F1_2 = trial.suggest_int('F1_2', model_space['F1_2'][0], model_space['F1_2'][1])
+            F2_1 = trial.suggest_int('F2_1', model_space['F2_1'][0], model_space['F2_1'][1])
+            F2_2 = trial.suggest_int('F2_2', model_space['F2_2'][0], model_space['F2_2'][1])
+            
             model_kwargs.update({
                 'dropout': trial.suggest_float('dropout', model_space['dropout'][0], model_space['dropout'][1]),
-                'F1_1': trial.suggest_int('F1_1', model_space['F1_1'][0], model_space['F1_1'][1]),
-                'F1_2': trial.suggest_int('F1_2', model_space['F1_2'][0], model_space['F1_2'][1]),
-                'F2_1': trial.suggest_int('F2_1', model_space['F2_1'][0], model_space['F2_1'][1]),
-                'F2_2': trial.suggest_int('F2_2', model_space['F2_2'][0], model_space['F2_2'][1]),
+                'F1': [F1_1, F1_2],  # Convert to list as expected by MMEEGNeX
+                'F2': [F2_1, F2_2],  # Convert to list as expected by MMEEGNeX
                 'D': trial.suggest_int('D', model_space['D'][0], model_space['D'][1]),
                 'kernel_1': trial.suggest_categorical('kernel_1', model_space['kernel_1']),
                 'kernel_2': trial.suggest_categorical('kernel_2', model_space['kernel_2']),
