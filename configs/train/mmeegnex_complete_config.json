@@ -1,0 +1,38 @@
+{
+  "model_type": "MMEEGNeX",
+  "dataset_type": "DEAP",
+  "data_root": null,
+  "cache_path": null,
+  "batch_size": 128,
+  "num_epochs": 200,
+  "learning_rate": 0.002321366031562099,
+  "work_dir": "./.exp/mmeegnex_experiments",
+  "experiment_name": "mmeegnex_best_params",
+  "resume": false,
+  "split_ratios": [0.6, 0.2, 0.2],
+  "random_seed": 42,
+  "num_workers": 0,
+  "optimizer": {
+    "type": "AdamW",
+    "lr": 0.002321366031562099,
+    "betas": [0.8820746924821328, 0.9155001761358021],
+    "weight_decay": 3.469791572544704e-05
+  },
+  "early_stopping": {
+    "enable": false,
+    "patience": 15,
+    "monitor": "mean_eval_accuracy",
+    "min_delta": 0.001
+  },
+  "model": {
+    "chunk_size": 128,
+    "num_electrodes": 32,
+    "dropout": 0.11522034704274721,
+    "F1": [8, 30],
+    "F2": [17, 12],
+    "D": 3,
+    "num_classes": 3,
+    "kernel_1": 128,
+    "kernel_2": 16
+  }
+}

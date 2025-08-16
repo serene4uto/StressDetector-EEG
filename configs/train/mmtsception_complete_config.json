@@ -1,0 +1,37 @@
+{
+  "model_type": "MMTSCeption",
+  "dataset_type": "DEAP",
+  "data_root": null,
+  "cache_path": null,
+  "batch_size": 128,
+  "num_epochs": 200,
+  "learning_rate": 0.003795344412190762,
+  "work_dir": "./.exp/mmtsception_experiments",
+  "experiment_name": "mmtsception_best_params",
+  "resume": false,
+  "split_ratios": [0.6, 0.2, 0.2],
+  "random_seed": 42,
+  "num_workers": 0,
+  "optimizer": {
+    "type": "AdamW",
+    "lr": 0.003795344412190762,
+    "betas": [0.8807374894149752, 0.9475521739040691],
+    "weight_decay": 8.7839615436099e-05
+  },
+  "early_stopping": {
+    "enable": false,
+    "patience": 15,
+    "monitor": "mean_eval_accuracy",
+    "min_delta": 0.001
+  },
+
+  "model": {
+    "num_classes": 3,
+    "num_electrodes": 32,
+    "sampling_rate": 128,
+    "num_T": 15,
+    "num_S": 24,
+    "hid_channels": 46,
+    "dropout": 0.5775407000881697
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "timestamp": "2025-08-16T22:54:10.696091",
+  "device": "cuda",
+  "output_directory": "C:\\Users\\nguye\\Documents\\GitHub\\StressDetector-EEG\\.benchmark",
+  "models": {
+    "MMTSCeption": {
+      "accuracy": 99.0104,
+      "speed_batch_128": {
+        "avg_time_ms": 42.02989101409912,
+        "throughput_samples_per_sec": 3045.4516276775926,
+        "std_time_ms": 0.592293682350062
+      },
+      "latency_ms": 42.02989101409912,
+      "throughput_samples_per_sec": 3045.4516276775926,
+      "memory_usage": {
+        "model_size_mb": 0.17052459716796875,
+        "gpu_memory_usage_mb": 0.0322265625
+      },
+      "training_time": {
+        "estimated_training_time_minutes": 125.95494747161865,
+        "inference_time_per_batch_ms": 41.98498249053955,
+        "training_time_per_batch_ms": 104.96245622634888
+      }
+    }
+  }
+}

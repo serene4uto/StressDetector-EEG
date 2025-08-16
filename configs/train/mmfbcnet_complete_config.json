@@ -1,0 +1,35 @@
+{
+  "model_type": "MMFBCNet",
+  "dataset_type": "DEAP",
+  "data_root": null,
+  "cache_path": null,
+  "batch_size": 64,
+  "num_epochs": 200,
+  "learning_rate": 0.000441458473151415,
+  "work_dir": "./.exp/mmfbcnet_experiments",
+  "experiment_name": "mmfbcnet_best_params",
+  "resume": false,
+  "split_ratios": [0.6, 0.2, 0.2],
+  "random_seed": 42,
+  "num_workers": 0,
+  "optimizer": {
+    "type": "Adam",
+    "lr": 0.000441458473151415,
+    "betas": [0.8697869317888086, 0.9811969854953689],
+    "eps": 1.024872176984709e-09
+  },
+  "early_stopping": {
+    "enable": false,
+    "patience": 15,
+    "monitor": "mean_eval_accuracy",
+    "min_delta": 0.001
+  },
+
+  "model": {
+    "num_classes": 3,
+    "num_electrodes": 32,
+    "chunk_size": 128,
+    "in_channels": 1,
+    "num_S": 63
+  }
+}
