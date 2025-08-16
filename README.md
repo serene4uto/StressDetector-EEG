@@ -117,6 +117,25 @@ optuna-dashboard sqlite:///.exp/optuna_storage/MMTSCeption_DEAP_optimization.db
 - `DEAP`: Database for Emotion Analysis using Physiological signals (repurposed for stress detection through label mapping)
 - `SAM40`: Stress Analysis in Motion dataset
 
+#### DEAP Dataset Repurposing
+
+The DEAP dataset is repurposed from emotion recognition to stress detection through a sophisticated label transformation process based on Russell's Model of emotion:
+
+**Original DEAP Labels:**
+The original DEAP dataset categorizes emotions using five metrics: Arousal, Valence, Dominance, Liking, and Familiarity, each rated on a scale from 1 to 9. For stress detection, we utilize the two primary dimensions: Arousal and Valence.
+
+**Russell's Model Foundation:**
+According to Russell's Model, which maps emotions in a Valence-Arousal space, the second quadrant (high arousal, low valence) encompasses emotions such as nervousness, anger, annoyance, and anxiety. These emotions are commonly associated with stress.
+
+**Stress Level Mapping:**
+The `DeapAVToStress` transformation converts the 2D emotion space to 3-class stress levels:
+
+| Stress Level | Condition | Description |
+|--------------|-----------|-------------|
+| **High Stress (2)** | `arousal: 7.5-9 AND valence: 1-2.5` | High activation + low pleasantness (nervousness, anger, anxiety) |
+| **Low Stress (1)** | `arousal: 5-7.5 AND valence: 2.5-5` | Medium activation + medium pleasantness |
+| **No Stress (0)** | All other cases | Default case (calm, relaxed, or neutral states) |
+
 ### Configuration-Based Training
 
 The training system uses JSON configuration files that specify all training and model parameters:
